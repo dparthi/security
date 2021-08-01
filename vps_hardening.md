@@ -19,3 +19,29 @@ The above one is crisp and on dot. In about 10 minutes, I had secured the system
 
 > https://serverfault.com/questions/783082/how-to-use-the-ssh-server-with-pam-but-disallow-password-auth
 
+
+
+### Alerts
+
+I wanted to have an email alert whenever there is any login into my vps. This one helped me with the same (Check Fritz answer):
+
+> https://askubuntu.com/questions/179889/how-do-i-set-up-an-email-alert-when-a-ssh-login-is-successful
+
+Modified the script a tiny bit for getting only the relevant info emailed:
+
+```shell
+#!/bin/sh
+
+# Change these two lines:
+sender="sender@senderdomain.com"
+recepient="receiver@receiverdomain.com"
+
+if [ "$PAM_TYPE" != "close_session" ]; then
+    host="`hostname`"
+    subject="SSH Login: $PAM_USER from $PAM_RHOST on $host"
+    # Message to send, e.g. the current environment variables.
+    message="`env`"
+    echo "`date; echo "$message" | egrep 'XDG|PAM'`" | mail -r "$sender" -s "$subject" "$recepient"
+fi
+```
+
